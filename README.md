@@ -1,5 +1,4 @@
 # ss-noloads
-<br><br>
 Requirements: 
 - Windows, though all os.system commands can easily be adapted to Linux or other systems
 - FFmpeg, either place the exe in the same directory, or add to PATH
