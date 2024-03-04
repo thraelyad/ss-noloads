@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import os
-from collections import deque
+from queue import Queue
 
 def remove_small_circle(frame, rectangle_size=200):
     # Get the center coordinates of the frame, and move y down 20 pixels to account for the required asymmetric cropping
@@ -49,7 +49,7 @@ def video_to_frames(input_loc, output_loc, crop_region):
     cropped = None
     prevFrameVariance = 0
     loadCounter = 0
-    frames = deque(maxlen=6) # useful data structure to store frames
+    frames = Queue(maxsize=6) # useful data structure to store frames
 
     print("\nConverting video (this may take a while) ...")
 
@@ -62,7 +62,7 @@ def video_to_frames(input_loc, output_loc, crop_region):
             break
         # maybe re-add histogram equalization?
         # cropped_image = image[y:y+h,x:x+h]
-        frames.append(frame)
+        frames.put(frame)
         cropped = frame[int(crop_vals[1]):int(crop_vals[1])+int(crop_vals[3]), int(crop_vals[0]):int(crop_vals[0])+int(crop_vals[2])]
         if(frameCount == 0): prevFrame = cropped
         #gray = cv2.fastNlMeansDenoising(cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY))
@@ -100,9 +100,9 @@ def video_to_frames(input_loc, output_loc, crop_region):
                 if(loadCounter > 0 and loadCounter <= 6): # this was not a real load
                     print("Fake load discovered")
                     #frameCount -= 6 # only uncomment this if you comment out continue (for analysis of skipped frames)
-                    for f in frames:
+                    while not frames.empty():
                         print("Writing to ", frameCount, " to unskip load.")
-                        cv2.imwrite(output_loc + "/%#06d.jpg" % (frameCount), f) # "un-skip" the fake load
+                        cv2.imwrite(output_loc + "/%#06d.jpg" % (frameCount), frames.get()) # "un-skip" the fake load
                         frameCount += 1
                 loadCounter = 0
 
