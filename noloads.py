@@ -30,7 +30,6 @@ def remove_cursor(frame, cursor_template):
         cv2.rectangle(frame, pt, (pt[0] + w, pt[1] + h), 0, -1)
     return frame
 
-# Todo: check if load was less than 10 frames. If it was, go back and don't count it
 def video_to_frames(input_loc, output_loc, crop_region):
     try:
         os.mkdir(output_loc)
